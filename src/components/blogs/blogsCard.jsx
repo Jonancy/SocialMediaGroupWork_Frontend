@@ -18,7 +18,7 @@ export default function BlogsCard({ blog }) {
           <img
             alt=""
             className="object-cover w-full h-52 dark:bg-gray-500 rounded-t-lg"
-            src="https://source.unsplash.com/200x200/?fashion?1"
+            src={blog?.blogImageUrl}
           />
         </a>
         <div className="flex flex-col flex-1 p-6">

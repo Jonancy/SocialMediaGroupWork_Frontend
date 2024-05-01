@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { RxCross1 } from "react-icons/rx";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { CircularProgress, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-import { postBlogs } from "../../../services/client/blogs.service";
+import { updateBlogs } from "../../../services/client/blogs.service";
 import * as Yup from "yup";
 import { getLocalStorage } from "../../../utils/localStorage";
 
-export default function PostBlogs() {
+export default function UpdateBlogs() {
   //TODO: Need to fix the UI
   const [viewFile, setViewFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // State to manage loading
+  const { blog_id } = useParams();
 
   const initialValues = {
     BlogTitle: "",
@@ -22,10 +23,8 @@ export default function PostBlogs() {
   const blogsPostSchema = Yup.object({
     BlogTitle: Yup.string()
       .min(6, "Title must be at least 6 letters")
-      .max(100, "Title must be below 100 letters")
-      .required(),
-    BlogContent: Yup.string().required(),
-    BlogImage: Yup.string().required(),
+      .max(100, "Title must be below 100 letters"),
+    BlogContent: Yup.string(),
   });
 
   const user_id = getLocalStorage().id;
@@ -45,9 +44,16 @@ export default function PostBlogs() {
     onSubmit: async (values) => {
       setIsLoading(true);
       const formData = new FormData();
-      formData.append("BlogTitle", values.BlogTitle);
-      formData.append("BlogContent", values.BlogContent);
-      formData.append("BlogImage", values.BlogImage);
+      if (values.BlogTitle != undefined) {
+        formData.append("BlogTitle", values.BlogTitle);
+      }
+
+      if (values.BlogContent != undefined) {
+        formData.append("BlogContent", values.BlogContent);
+      }
+      if (values.BlogContent != null) {
+        formData.append("BlogImage", values.BlogImage);
+      }
       await submitBlog(formData);
     },
   });
@@ -69,7 +75,7 @@ export default function PostBlogs() {
   const submitBlog = async (formData) => {
     if (user_id != null) {
       try {
-        const res = await postBlogs(formData, user_id);
+        const res = await updateBlogs(formData, blog_id, user_id);
         console.log(res.data);
         toast.success(res.data.message);
 
@@ -78,7 +84,7 @@ export default function PostBlogs() {
         setViewFile(null);
         setIsLoading(false);
       } catch (error) {
-        console.error(error.response.data.message);
+        console.error(error.response);
         toast.error(error.response.data.message);
       }
     } else {
@@ -88,8 +94,10 @@ export default function PostBlogs() {
   };
 
   console.log(values);
+  console.log(errors);
 
   const navigate = useNavigate();
+  const isFormEmpty = Object.values(values).every((value) => !value);
 
   const cancelNavigate = () => {
     //   navigate(`/vendor/${hotel_name}/settings`);
@@ -213,11 +221,11 @@ export default function PostBlogs() {
           <button
             type="submit"
             className={`p-3 rounded-3xl pl-7 pr-7 flex gap-2 text-white bg-violet-950 duration-300  ${
-              isLoading
+              isLoading || isFormEmpty
                 ? "cursor-not-allowed opacity-80"
                 : " hover:bg-violet-900 "
             }`}
-            disabled={isLoading}
+            disabled={isLoading || isFormEmpty}
           >
             {isLoading && <CircularProgress color="primary" size={20} />}
             <p>Save</p>

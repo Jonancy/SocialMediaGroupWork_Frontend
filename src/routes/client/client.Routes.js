@@ -1,4 +1,6 @@
 import { lazy } from "react";
+const UpdateBlogs = lazy(() => import("../../pages/client/blogs/editBlog"));
+const UserProfile = lazy(() => import("../../pages/client/userProfile"));
 const BlogsMainPage = lazy(() =>
   import("../../pages/client/blogs/blogsMainPage")
 );
@@ -22,6 +24,19 @@ export const clientRoutes = [
     id: "specificBlogs",
     path: "/specific-blogs/:blog_id",
     element: BlogsMainPage,
+    hasClientLayout: true,
+  },
+
+  {
+    id: "specificUser",
+    path: "/specific-user/:user_id",
+    element: UserProfile,
+    hasClientLayout: true,
+  },
+  {
+    id: "editBlogs",
+    path: "/edit-blogs/:blog_id",
+    element: UpdateBlogs,
     hasClientLayout: true,
   },
 ];

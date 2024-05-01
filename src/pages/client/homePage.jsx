@@ -3,6 +3,7 @@ import { getAllBlogs } from "../../services/client/blogs.service";
 import BlogsCard from "../../components/blogs/blogsCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Pagination, Stack } from "@mui/material";
+import { heha } from "../../services/client/auth.service";
 
 export default function HomePage() {
   const [getAllBlog, setAllBlogs] = useState([]);
@@ -15,7 +16,7 @@ export default function HomePage() {
   const getBlogs = async () => {
     try {
       const res = await getAllBlogs(page);
-      setAllBlogs(res.data.data.blogs);
+      setAllBlogs(res.data.data.blog);
       console.log(res.data);
       setTotalPages(
         Math.ceil(res.data.data.totalBlogs / res.data.data.pageSize)
@@ -25,8 +26,18 @@ export default function HomePage() {
     }
   };
 
+  const hehe = async () => {
+    try {
+      const res = await heha();
+      console.log(res);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     getBlogs();
+    hehe();
   }, [page]);
 
   const handlePageChange = (pageNumber) => {
