@@ -44,7 +44,6 @@ export default function RegisterUser() {
     }
   };
 
-  console.log(values);
   return (
     <div className="flex items-center justify-center">
       <form

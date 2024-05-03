@@ -5,7 +5,7 @@ export const login = (form) => {
 };
 
 export const registerUser = (formData) => {
-  return http.post("/User/postUser", formData);
+  return http.post("/User", formData);
 };
 
 export const heha = () => {

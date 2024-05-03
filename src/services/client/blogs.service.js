@@ -1,11 +1,20 @@
 import { http } from "../url/baseURL";
 
-export const getAllBlogs = (page) => {
-  return http.get("/Blog/getAllBlogs", { params: { pageNumber: page } });
+export const getAllBlogs = (page, sortOrder) => {
+  return http.get("/Blog/getAllBlogs", {
+    params: { pageNumber: page, sortOrder: sortOrder },
+  });
 };
 
 export const postBlogs = (formData, id) => {
+  console.log(id);
   return http.post("/Blog/postBlogs", formData, {
+    headers: { Authorization: id },
+  });
+};
+export const hehe = (id) => {
+  console.log(id);
+  return http.post("/Blog/hee", null, {
     headers: { Authorization: id },
   });
 };

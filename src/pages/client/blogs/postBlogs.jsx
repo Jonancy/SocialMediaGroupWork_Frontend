@@ -4,7 +4,7 @@ import { RxCross1 } from "react-icons/rx";
 import { Link, useNavigate } from "react-router-dom";
 import { CircularProgress, TextField } from "@mui/material";
 import { toast } from "react-toastify";
-import { postBlogs } from "../../../services/client/blogs.service";
+import { hehe, postBlogs } from "../../../services/client/blogs.service";
 import * as Yup from "yup";
 import { getLocalStorage } from "../../../utils/localStorage";
 
@@ -69,7 +69,8 @@ export default function PostBlogs() {
   const submitBlog = async (formData) => {
     if (user_id != null) {
       try {
-        const res = await postBlogs(formData, user_id);
+        // const res = await postBlogs(formData, user_id);
+        const res = await hehe();
         console.log(res.data);
         toast.success(res.data.message);
 
@@ -78,16 +79,15 @@ export default function PostBlogs() {
         setViewFile(null);
         setIsLoading(false);
       } catch (error) {
-        console.error(error.response.data.message);
-        toast.error(error.response.data.message);
+        console.log(error.response);
+        console.error(error.response.data);
+        toast.error(error.response.data);
       }
     } else {
       setIsLoading(false);
       toast.error("Please login and continue!");
     }
   };
-
-  console.log(values);
 
   const navigate = useNavigate();
 

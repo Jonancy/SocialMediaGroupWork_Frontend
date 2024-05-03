@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllBlogs } from "../../services/client/blogs.service";
 import BlogsCard from "../../components/blogs/blogsCard";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Pagination, Stack } from "@mui/material";
+import { Pagination, Stack, Checkbox } from "@mui/material";
 import { heha } from "../../services/client/auth.service";
 
 export default function HomePage() {
@@ -11,13 +11,15 @@ export default function HomePage() {
   const queryParams = new URLSearchParams(location.search);
   const page = parseInt(queryParams.get("page")) || 1;
   const [totalPages, setTotalPages] = useState(1);
+  const [sortOrder, setSortOrder] = useState(
+    queryParams.get("sortOrder") || null
+  ); // To store filter type
   const navigate = useNavigate();
 
   const getBlogs = async () => {
     try {
-      const res = await getAllBlogs(page);
+      const res = await getAllBlogs(page, sortOrder);
       setAllBlogs(res.data.data.blog);
-      console.log(res.data);
       setTotalPages(
         Math.ceil(res.data.data.totalBlogs / res.data.data.pageSize)
       );
@@ -26,52 +28,67 @@ export default function HomePage() {
     }
   };
 
-  const hehe = async () => {
-    try {
-      const res = await heha();
-      console.log(res);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   useEffect(() => {
     getBlogs();
-    hehe();
-  }, [page]);
+  }, [page, sortOrder]); // Watch for changes in both page and order
 
   const handlePageChange = (pageNumber) => {
-    // setLoading(true);
     navigate(`/home?page=${pageNumber}`);
   };
 
+  const handleFilterChange = (filter) => {
+    if (sortOrder !== filter) {
+      // Toggle off if the filter is already selected
+      const newOrder = sortOrder === filter ? "" : filter;
+      setSortOrder(newOrder);
+      navigate(`/home?page=${page}&sortOrder=${newOrder}`);
+    } else {
+      setSortOrder("");
+      navigate("/home");
+    }
+  };
+
   return (
-    <div className="w-full flex gap-6 items-center justify-center my-10">
-      <div className=" w-[20%]">
-        <p>filter</p>
+    <div className="flex justify-center items-start my-10 space-x-6">
+      <div className="w-1/4">
+        <p className="font-bold mb-2">Filter:</p>
+        <div className="flex items-center mb-2">
+          <Checkbox
+            checked={sortOrder === "random"}
+            onChange={() => handleFilterChange("random")}
+          />
+          <label className="ml-2">Random</label>
+        </div>
+        <div className="flex items-center mb-2">
+          <Checkbox
+            checked={sortOrder === "popularity"}
+            onChange={() => handleFilterChange("popularity")}
+          />
+          <label className="ml-2">Popularity</label>
+        </div>
+        <div className="flex items-center mb-2">
+          <Checkbox
+            checked={sortOrder === "recent"}
+            onChange={() => handleFilterChange("recent")}
+          />
+          <label className="ml-2">Recent</label>
+        </div>
       </div>
-      <div className=" flex flex-col  gap-6">
-        <div className=" grid grid-cols-3 ">
-          {getAllBlog?.map((blog) => (
-            <BlogsCard blog={blog} />
+      <div className="w-3/4">
+        <div className="grid grid-cols-1 gap-6">
+          {getAllBlog.map((blog) => (
+            <BlogsCard key={blog.id} blog={blog} />
           ))}
         </div>
-        <div className="flex justify-center  items-center ">
-          <Stack spacing={2} className="">
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={(event, value) => handlePageChange(value)}
-              variant="outlined"
-              // shape="rounded"
-              className=""
-              size="large"
-            />
-          </Stack>
+        <div className="flex justify-center items-center mt-6">
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(event, value) => handlePageChange(value)}
+            variant="outlined"
+            size="large"
+          />
         </div>
-      </div>
-      <div className=" w-[20%]">
-        <p>notifications</p>
       </div>
     </div>
   );
