@@ -75,7 +75,7 @@ export default function UpdateBlogs() {
   const submitBlog = async (formData) => {
     if (user_id != null) {
       try {
-        const res = await updateBlogs(formData, blog_id, user_id);
+        const res = await updateBlogs(formData, blog_id);
         console.log(res.data);
         toast.success(res.data.message);
 

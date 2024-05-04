@@ -91,7 +91,12 @@ export default function Login() {
             <div className="text-red-500">{errors.password}</div>
           ) : null}
         </div>
-
+        <p
+          className="text-sm hover:underline cursor-pointer"
+          onClick={() => navigate("/email-verification")}
+        >
+          Forgot password?
+        </p>
         <div>
           <button
             type="submit"

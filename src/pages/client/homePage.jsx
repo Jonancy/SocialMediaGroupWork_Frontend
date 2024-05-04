@@ -3,7 +3,6 @@ import { getAllBlogs } from "../../services/client/blogs.service";
 import BlogsCard from "../../components/blogs/blogsCard";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Pagination, Stack, Checkbox } from "@mui/material";
-import { heha } from "../../services/client/auth.service";
 
 export default function HomePage() {
   const [getAllBlog, setAllBlogs] = useState([]);
@@ -35,7 +34,6 @@ export default function HomePage() {
   const handlePageChange = (pageNumber) => {
     navigate(`/home?page=${pageNumber}`);
   };
-
   const handleFilterChange = (filter) => {
     if (sortOrder !== filter) {
       // Toggle off if the filter is already selected
@@ -44,7 +42,7 @@ export default function HomePage() {
       navigate(`/home?page=${page}&sortOrder=${newOrder}`);
     } else {
       setSortOrder("");
-      navigate("/home");
+      navigate(`/home?page=${page}`);
     }
   };
 

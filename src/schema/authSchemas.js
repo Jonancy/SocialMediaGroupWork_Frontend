@@ -16,3 +16,10 @@ export const userLoginSchema = Yup.object({
     .required("Email is required"),
   password: Yup.string().required("Passowrd is required"),
 });
+
+export const passwordResetValidSchema = Yup.object({
+  otp: Yup.string("Input must be a string").required("Please enter your code!"),
+  newPassword: Yup.string("Input must be a string").required(
+    "Please enter your newPassword!"
+  ),
+});

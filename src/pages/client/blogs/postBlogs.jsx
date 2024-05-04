@@ -66,11 +66,13 @@ export default function PostBlogs() {
     setFieldValue("BlogImage", null);
   };
 
+  console.log(user_id);
+
   const submitBlog = async (formData) => {
     if (user_id != null) {
       try {
-        // const res = await postBlogs(formData, user_id);
-        const res = await hehe();
+        const res = await postBlogs(formData);
+        // const res = await hehe(user_id);
         console.log(res.data);
         toast.success(res.data.message);
 
@@ -82,6 +84,7 @@ export default function PostBlogs() {
         console.log(error.response);
         console.error(error.response.data);
         toast.error(error.response.data);
+        setIsLoading(false);
       }
     } else {
       setIsLoading(false);

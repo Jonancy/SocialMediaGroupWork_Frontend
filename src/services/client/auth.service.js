@@ -8,6 +8,6 @@ export const registerUser = (formData) => {
   return http.post("/User", formData);
 };
 
-export const heha = () => {
-  return http.get("/User/hehe");
+export const sendOTPEmail = (email) => {
+  return http.post("/Email/send-otp", null, { params: { email: email } });
 };
