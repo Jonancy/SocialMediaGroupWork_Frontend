@@ -36,3 +36,7 @@ export const recoverDeletedBlogs = (blog_id) => {
 export const specificBlogUpdateHistory = (id) => {
   return http.get(`/Blog/getBlogHistory/${id}`);
 };
+
+export const postBlogVote = (blog_id, vote) => {
+  return http.post(`/Blog/vote/${blog_id}`, { vote: vote });
+};

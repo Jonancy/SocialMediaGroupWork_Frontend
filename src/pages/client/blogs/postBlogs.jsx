@@ -22,7 +22,6 @@ export default function PostBlogs() {
   const blogsPostSchema = Yup.object({
     BlogTitle: Yup.string()
       .min(6, "Title must be at least 6 letters")
-      .max(100, "Title must be below 100 letters")
       .required(),
     BlogContent: Yup.string().required(),
     BlogImage: Yup.string().required(),

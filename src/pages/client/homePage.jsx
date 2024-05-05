@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllBlogs } from "../../services/client/blogs.service";
 import BlogsCard from "../../components/blogs/blogsCard";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Pagination, Stack, Checkbox } from "@mui/material";
+import { Pagination, Stack, Checkbox, Button } from "@mui/material";
 
 export default function HomePage() {
   const [getAllBlog, setAllBlogs] = useState([]);
@@ -47,33 +47,38 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex justify-center items-start my-10 space-x-6">
-      <div className="w-1/4">
-        <p className="font-bold mb-2">Filter:</p>
-        <div className="flex items-center mb-2">
-          <Checkbox
-            checked={sortOrder === "random"}
-            onChange={() => handleFilterChange("random")}
-          />
-          <label className="ml-2">Random</label>
-        </div>
-        <div className="flex items-center mb-2">
-          <Checkbox
-            checked={sortOrder === "popularity"}
-            onChange={() => handleFilterChange("popularity")}
-          />
-          <label className="ml-2">Popularity</label>
-        </div>
-        <div className="flex items-center mb-2">
-          <Checkbox
-            checked={sortOrder === "recent"}
-            onChange={() => handleFilterChange("recent")}
-          />
-          <label className="ml-2">Recent</label>
+    <div className="flex flex-col justify-center items-center  my-10">
+      <div className=" sticky top-16 w-full flex flex-col items-center justify-center shadow-sm bg-white">
+        <p className="font-bold mb-2 text-xl">Filter by:</p>
+        <div className="flex gap-4">
+          <div className="flex items-center mb-2 ">
+            <Button
+              variant={sortOrder === "random" ? "contained" : "outlined"}
+              onClick={() => handleFilterChange("random")}
+            >
+              Random
+            </Button>
+          </div>
+          <div className="flex items-center mb-2">
+            <Button
+              variant={sortOrder === "popularity" ? "contained" : "outlined"}
+              onClick={() => handleFilterChange("popularity")}
+            >
+              Popularity
+            </Button>
+          </div>
+          <div className="flex items-center mb-2">
+            <Button
+              variant={sortOrder === "recent" ? "contained" : "outlined"}
+              onClick={() => handleFilterChange("recent")}
+            >
+              Recent
+            </Button>
+          </div>
         </div>
       </div>
       <div className="w-3/4">
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4">
           {getAllBlog.map((blog) => (
             <BlogsCard key={blog.id} blog={blog} />
           ))}

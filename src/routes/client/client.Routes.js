@@ -1,4 +1,7 @@
 import { lazy } from "react";
+const PasswordResetProfile = lazy(() =>
+  import("../../pages/client/auth/passwordResetProfile")
+);
 const UpdateBlogs = lazy(() => import("../../pages/client/blogs/editBlog"));
 const UserProfile = lazy(() => import("../../pages/client/userProfile"));
 const BlogsMainPage = lazy(() =>
@@ -37,6 +40,12 @@ export const clientRoutes = [
     id: "editBlogs",
     path: "/edit-blogs/:blog_id",
     element: UpdateBlogs,
+    hasClientLayout: true,
+  },
+  {
+    id: "updatePass",
+    path: "/specific-user/:user_id/updatePassword",
+    element: PasswordResetProfile,
     hasClientLayout: true,
   },
 ];

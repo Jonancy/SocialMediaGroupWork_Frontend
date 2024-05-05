@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getUserDetails } from "../../services/client/user.service";
+import { deleteUser, getUserDetails } from "../../services/client/user.service";
 
 import { toast } from "react-toastify";
 import BlogsSection from "../../features/blogs/blogsSection";
 import { Tabs, Tab, Dialog, Button, DialogActions } from "@mui/material";
 import DeletedBlogsSection from "../../features/blogs/deletedBlogSection";
-import { getLocalStorage } from "../../utils/localStorage";
+import { clearLocalStorage, getLocalStorage } from "../../utils/localStorage";
+
 export default function UserProfile() {
   const [user, setUser] = useState({});
   const user_id = getLocalStorage().id;
@@ -36,6 +37,10 @@ export default function UserProfile() {
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
+
+  const handleDeleteProfile = () => {
+    setIsDialogOpen(true); // Open the dialog box
+  };
   console.log(user);
 
   //!Chuttauna ko lai blogs either its temporarirly deleted or not
@@ -43,23 +48,22 @@ export default function UserProfile() {
   const activeBlogs = blogs.filter((blog) => !blog.isDeleted);
   const deletedBlogs = blogs.filter((blog) => blog.isDeleted);
 
+  const deleteUserProfile = async () => {
+    try {
+      const res = await deleteUser(user_id);
+      console.log(res.data);
+      toast.success(res.data.message);
+      clearLocalStorage();
+      navigate("/login");
+    } catch (e) {
+      console.log(e);
+    }
+  };
   return (
     <div className=" flex justify-center items-center relative">
-      <div className="p-4 flex flex-col gap-20 w-[80%] ">
-        <div className="shadow-lg bg-gray-300 p-4 rounded-lg px-6  sticky top-28 h-fit z-30">
+      <div className="p-4 flex flex-col gap-10 w-[80%] ">
+        <div className="shadow-lg bg-gray-300 py-4 rounded-lg px-6 h-fit z-30">
           <div className="flex flex-col gap-3">
-            {/* <div className="flex justify-center items-center ">
-                <div
-                  className="w-[10rem] h-[10rem] rounded-full cursor-pointer hover:opacity-90"
-                  onClick={viewUserImage}
-                >
-                  <img
-                    className="w-full h-full  rounded-full object-cover"
-                    src={user.profile_picture}
-                    alt="Profile"
-                  />
-                </div>
-              </div> */}
             <div className=" flex flex-col gap-3 text-sm">
               <p>
                 <strong>Name: </strong>
@@ -71,18 +75,29 @@ export default function UserProfile() {
               </p>
               <p>
                 <strong>Phone Number: </strong>
-                {user.phone_number}
+                {user.phone}
               </p>
-            </div>
-            <div className=" font-semibold">
               <p>
-                {user.user_name} - {user.roles}
+                <strong>Phone Number: </strong>
+                {user.gender}
               </p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-sm mb-2 ">
-                {/* Joined in {formattedDate} */}
-              </p>
+              <div className="flex gap-2">
+                <div className="text-sm font-semibold p-2 hover:bg-slate-200 duration-300 rounded-lg bg-slate-100 w-fit cursor-pointer border">
+                  <p>Edit profile</p>
+                </div>
+                <Link
+                  to={`/specific-user/${user_id}/updatePassword`}
+                  className="text-sm font-semibold p-2 hover:bg-slate-200 duration-300 rounded-lg bg-slate-100 w-fit cursor-pointer border"
+                >
+                  <p>Edit password</p>
+                </Link>
+                <div
+                  onClick={handleDeleteProfile}
+                  className="text-sm font-semibold p-2 hover:bg-slate-200 duration-300 rounded-lg bg-slate-100 w-fit cursor-pointer border"
+                >
+                  <p>Delete profile</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -100,6 +115,24 @@ export default function UserProfile() {
               blogs={deletedBlogs}
             />
           )}
+
+          {/* Dialog for confirming profile deletion */}
+          <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
+            <div className="p-4">
+              <h2>Confirm Deletion</h2>
+              <p>Are you sure you want to delete your profile?</p>
+            </div>
+            <DialogActions>
+              <Button onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+              <Button
+                onClick={deleteUserProfile}
+                variant="contained"
+                color="error"
+              >
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
         </div>
       </div>
     </div>

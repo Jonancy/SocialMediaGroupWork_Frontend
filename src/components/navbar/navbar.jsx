@@ -1,11 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { clearLocalStorage, getLocalStorage } from "../../utils/localStorage";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 export default function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
   const user = getLocalStorage().id;
+  const [openDialog, setOpenDialog] = useState(false);
+
   console.log(user);
   const toggleUserMenu = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
@@ -34,6 +43,13 @@ export default function Navbar() {
     setIsUserMenuOpen(false);
   }
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
   return (
     <nav className="bg-gray-800 sticky top-0 z-40">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -42,46 +58,49 @@ export default function Navbar() {
             <div className="flex space-x-4">
               <Link
                 to="/home"
-                className="  hover:bg-white rounded-md px-3 py-2 text-sm font-medium cursor-pointer "
+                className="  hover:text-gray-600 duration-300 rounded-md px-3 py-2 text-sm font-medium text-white cursor-pointer "
               >
                 Home
-              </Link>
-              <Link
-                // to={"/home"}
-                className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium"
-              >
-                Team
-              </Link>
-              <Link className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">
-                Projects
-              </Link>
-              <Link className="text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium">
-                Calendar
               </Link>
             </div>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-            <button
-              type="button"
-              className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-            >
-              <span className="absolute -inset-1.5"></span>
-              <span className="sr-only">View notifications</span>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                />
-              </svg>
-            </button>
+            {user && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleOpenDialog}
+                  className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                >
+                  <span className="absolute -inset-1.5"></span>
+                  <span className="sr-only">View notifications</span>
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+                    />
+                  </svg>
+                </button>
+                <Dialog open={openDialog} onClose={handleCloseDialog}>
+                  <DialogTitle>Notification</DialogTitle>
+                  <DialogContent>
+                    <p>hhhwhw</p>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleCloseDialog}>Close</Button>
+                  </DialogActions>
+                </Dialog>
+              </>
+            )}
+
             {user > 0 ? (
               <div className="relative ml-3">
                 <div>

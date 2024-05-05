@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RxDotsHorizontal } from "react-icons/rx";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   deleteBlogs,
   tempDeleteBlogs,
@@ -17,6 +17,7 @@ import {
 import BlogHistoryModal from "./blogHistoryModal";
 export default function BlogsSection({ blogs, getUserDetail }) {
   const { user_id } = useParams();
+  const navigate = useNavigate();
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownBlogId, setDropdownBlogId] = useState(null);
@@ -55,7 +56,7 @@ export default function BlogsSection({ blogs, getUserDetail }) {
     setDropdownBlogId(blogId);
     setIsHistoryDialogOpen(true);
   };
-
+  console.log(blogs);
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-4 text-sm">
@@ -72,9 +73,10 @@ export default function BlogsSection({ blogs, getUserDetail }) {
             {blogs?.map((blog) => (
               <div
                 className="relative h-full overflow-hidden rounded-lg "
-                key={blog.blog_id}
+                key={blog.blogId}
               >
                 <div
+                  onClick={() => navigate(`/specific-blogs/${blog.blogId}`)}
                   //   onClick={() => handleRedirect(blog?.blog_id)}
                   className="hover:scale-105 duration-500 rounded-lg h-[15rem] cursor-pointer"
                 >
@@ -84,7 +86,7 @@ export default function BlogsSection({ blogs, getUserDetail }) {
                     src={blog?.blogImage}
                   ></img>
                   <div className="absolute bottom-4 left-4 text-white ">
-                    <p className="font-semibold ">{blog?.title}</p>
+                    <p className="font-semibold line-clamp-2">{blog?.title}</p>
                     <p className="line-clamp-3 mt-2 mr-2 text-xs">
                       {blog?.content}
                     </p>

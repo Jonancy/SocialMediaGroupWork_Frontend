@@ -104,6 +104,12 @@ export default function Login() {
           >
             Get Started
           </button>
+          <p
+            className="text-sm hover:underline cursor-pointer mt-2 text-center"
+            onClick={() => navigate("/register")}
+          >
+            Have not registered yet, Register now?
+          </p>
         </div>
       </form>
     </div>

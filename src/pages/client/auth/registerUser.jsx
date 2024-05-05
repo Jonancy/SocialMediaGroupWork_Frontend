@@ -2,6 +2,7 @@ import { useFormik } from "formik";
 import { userRegisterSchema } from "../../../schema/authSchemas";
 import { registerUser } from "../../../services/client/auth.service";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterUser() {
   const user_id = 1;
@@ -38,11 +39,14 @@ export default function RegisterUser() {
       const res = await registerUser(values);
       console.log(res.data);
       toast.success(res.data.message);
+      navigate("/login");
     } catch (e) {
       console.log(e);
       toast.error(e.response.data.message);
     }
   };
+
+  const navigate = useNavigate();
 
   return (
     <div className="flex items-center justify-center">
@@ -156,7 +160,12 @@ export default function RegisterUser() {
             <div className="text-red-500">{errors.gender}</div>
           ) : null}
         </div>
-
+        <p
+          className="text-sm hover:underline cursor-pointer"
+          onClick={() => navigate("/login")}
+        >
+          Already registered, Login now?
+        </p>
         <div>
           <button
             type="submit"

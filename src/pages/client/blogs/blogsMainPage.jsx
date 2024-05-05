@@ -1,15 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { specificBlog } from "../../../services/client/blogs.service";
+import {
+  postBlogVote,
+  specificBlog,
+} from "../../../services/client/blogs.service";
 import { IoIosArrowForward } from "react-icons/io";
 import { BiCalendar, BiUpvote } from "react-icons/bi";
-import { FiTag } from "react-icons/fi";
-import { FaHeart } from "react-icons/fa";
+import { FiArrowDown, FiArrowUp, FiTag } from "react-icons/fi";
+import { BiSolidUpvote } from "react-icons/bi";
+import CommentCard from "../../../components/blogs/comments/commentCard";
+import { postBlogComments } from "../../../services/client/blog-comments.service";
+import { toast } from "react-toastify";
+import { BiSolidDownvote } from "react-icons/bi";
+import { getLocalStorage } from "../../../utils/localStorage";
 
 export default function BlogsMainPage() {
   const { blog_id } = useParams();
+  const user_id = getLocalStorage().id;
+
   const [blog, setBlog] = useState({});
   const [suggestions, setSuggestions] = useState([]);
+  const [blogComments, setBlogComments] = useState([]);
+  const [visibleComments, setVisibleComments] = useState(3);
+  const [text, setText] = useState("");
+  const [blogVotes, setBlogVotes] = useState([]);
 
   const getBlogDetails = async () => {
     try {
@@ -17,6 +31,8 @@ export default function BlogsMainPage() {
       console.log(res.data);
       setBlog(res.data.data.specificBlog);
       setSuggestions(res.data.data.blogSuggestions);
+      setBlogComments(res.data.data.blogComments);
+      setBlogVotes(res.data.data.blogVotes);
     } catch (e) {
       console.log(e);
     }
@@ -25,6 +41,56 @@ export default function BlogsMainPage() {
   useEffect(() => {
     getBlogDetails();
   }, [blog_id]);
+
+  // Shuffle function to randomize the array order
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
+  const showMoreComments = () => {
+    setVisibleComments(blogComments.length);
+  };
+
+  const showLessComments = () => {
+    setVisibleComments(3);
+  };
+
+  const postComments = async () => {
+    try {
+      const res = await postBlogComments(text, blog_id);
+      console.log(res);
+      toast.success(res.data.message);
+      setText("");
+      getBlogDetails();
+    } catch (e) {
+      console.log(e);
+      toast.error(e.response.data.message);
+    }
+  };
+
+  const postVote = async (vote) => {
+    try {
+      const res = await postBlogVote(blog_id, vote);
+      console.log(res);
+      toast.success(res.data.message);
+      setText("");
+      getBlogDetails();
+    } catch (e) {
+      console.log(e);
+      toast.error(e.response.data.message);
+    }
+  };
+
+  // Select random 4 blogs from suggestions
+  const randomFourBlogs = shuffleArray(suggestions).slice(0, 4);
+
+  // Find user's vote for the current blog
+  const userVote = blogVotes.find((vote) => vote.user.userId == user_id);
+
   return (
     <div>
       <div className="p-6 px-32 relative">
@@ -77,14 +143,33 @@ export default function BlogsMainPage() {
                 tag
                 {/* {blog.blog_Tag?.tag_name} */}
               </div>
-              <div
-                className="flex justify-end cursor-pointer"
-                // onClick={likeBlogss}
-              >
-                {/* <FaHeart
+              <div className="flex gap-4 items-center">
+                <div
+                  className="flex justify-end cursor-pointer"
+                  onClick={() => postVote(true)}
+                >
+                  {/* <FaHeart
                   className={`${likedBlog ? "text-violet-950" : "text-white"} `}
                 /> */}
-                <BiUpvote />
+
+                  <BiSolidUpvote
+                    className={`${
+                      userVote?.isVote ? "text-violet-950" : "text-white"
+                    }`}
+                  />
+                </div>
+                <div
+                  className="flex justify-end cursor-pointer"
+                  onClick={() => postVote(false)}
+                >
+                  <BiSolidDownvote
+                    className={`${
+                      userVote?.isVote == false
+                        ? "text-violet-950"
+                        : "text-white"
+                    }`}
+                  />
+                </div>
               </div>
             </div>
             <div className="border-t mt-6 pt-6">
@@ -101,14 +186,15 @@ export default function BlogsMainPage() {
               </div>
               <textarea
                 name="text"
-                // onChange={(e) => setText(e.target.value)}
-                className="border-2 h-[10rem] outline-violet-950 flex items-start p-2 rounded-md mt-4"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="border-2 h-[10rem] outline-violet-950 flex items-start p-2 rounded-md mt-4 w-full"
                 placeholder="Write your message here"
                 type="text"
               />
               <div className=" flex justify-end mt-4">
                 <button
-                  // onClick={postBlogComments}
+                  onClick={postComments}
                   className="bg-violet-950 rounded-md font-semibold cursor-pointer hover:bg-violet-950700 p-2 w-fit text-white"
                 >
                   <p>Send</p>
@@ -116,52 +202,31 @@ export default function BlogsMainPage() {
               </div>
               <div>
                 <p className="font-semibold text-xl">
-                  {/* COMMENTS({blog.allComments?.length}) */}
+                  COMMENTS( {blogComments?.length} )
                 </p>
-                {/* {blog?.allComments && (
+                {blogComments?.length < 0 && (
                   <p className="font-semibold text-gray-400">
                     Be the first one to comment
                   </p>
-                )} */}
-                <p className="font-semibold text-gray-400">
-                  Be the first one to comment
-                </p>
+                )}
               </div>
-              {/* <div className="flex flex-col gap-4 mt-4">
-                {blog ? (
-                  blog.allComments
+              <div className="flex flex-col gap-4 mt-4">
+                {blogComments ? (
+                  blogComments
                     ?.slice(0, visibleComments)
-                    .map((comments) => (
-                      <div
-                        className="shadow-md border rounded-lg p-6"
-                        key={comments.comment_id}
-                      >
-                        <div className="flex gap-2">
-                          <div className="w-12 h-12 rounded-full">
-                            <img
-                              alt="hehe"
-                              className="w-full h-full object-cover rounded-full"
-                              src={comments.user?.picture}
-                            />
-                          </div>
-                          <div className="flex flex-col">
-                            <p className="font-bold text-violet-950">
-                              {comments.user?.user_name}
-                            </p>
-                            <p className="text-sm font-semibold">
-                              {comments.content}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
+                    ?.map((comments) => (
+                      <CommentCard
+                        comment={comments}
+                        getBlogDetails={getBlogDetails}
+                      />
                     ))
                 ) : (
                   <div>
                     <p className="text-black">No comments</p>
                   </div>
                 )}
-              </div> */}
-              {/* {blog.allComments?.length > 3 && (
+              </div>
+              {blogComments?.length > 3 && (
                 <div className="mt-4 flex justify-end">
                   {visibleComments === 3 ? (
                     <button
@@ -185,51 +250,42 @@ export default function BlogsMainPage() {
                     </button>
                   )}
                 </div>
-              )} */}
+              )}
             </div>
           </div>
           <div className="w-[40%] pl-6">
             <p className="text-2xl font-semibold mb-4">
               YOU MIGHT ALSO LIKE THESE
             </p>
-            {/* <div className="grid grid-cols-1 gap-6 h-[60rem]  overflow-hidden overflow-y-auto scrollbar-none scroll-smooth">
-              {shuffledBlogs ? (
-                shuffledBlogs?.map((blog) => (
-                  <Link to={`/blogs/${blog.blog_id}`} key={blog.index}>
-                    <div className="flex flex-col border shadow-lg cursor-pointer transition-transform duration-300 transform-gpu hover:shadow-md hover:-translate-y-1">
-                      <div className="h-[15rem] border">
-                        <img
-                          className="h-full w-full object-cover"
-                          src={picture}
-                          alt="blogPic"
-                        />
-                      </div>
-                      <div className="flex flex-col pl-5 pr-5 pt-2 pb-8 h-[12rem]">
-                        <p className="text-violet-950 font-semibold text-xl ">
-                          {blogTag}
+            <div className="grid grid-cols-1 gap-6 ">
+              {randomFourBlogs.map((blog) => (
+                <Link to={`/specific-blogs/${blog.blogId}`} key={blog.blogId}>
+                  {/* Render each blog item */}
+                  <div className="flex flex-col border shadow-lg cursor-pointer transition-transform duration-300 transform-gpu hover:shadow-md hover:-translate-y-1">
+                    <div className="h-[15rem] border">
+                      <img
+                        className="h-full w-full object-cover"
+                        src={blog.blogImageUrl}
+                        alt={blog.blogTitle}
+                      />
+                    </div>
+                    <div className="flex flex-col pl-5 pr-5 pt-2 pb-8 h-[12rem]">
+                      <p className="text-violet-950 font-semibold text-xl">
+                        {blog.blogTag}
+                      </p>
+                      <div className="">
+                        <p className="items-center font-bold text-xl line-clamp-3 tracking-wide uppercase">
+                          {blog.blogTitle}
                         </p>
-                        <div className="">
-                          <p className="items-center font-bold text-xl line-clamp-3 tracking-wide uppercase">
-                            {title}
-                          </p>
-                          <div className="text-neutral-500 font-semibold overflow-hidden line-clamp-2 text-xs  mt-3">
-                            <p>
-                              {content} dbibfbds fihsdf sdbfygds fsdyufg
-                              dshbfyusd g dfds sdfg sudg disfsd fgdsyg fsd gfgyd
-                              dshfgdsygfydsg
-                            </p>
-                          </div>
+                        <div className="text-neutral-500 font-semibold overflow-hidden line-clamp-2 text-xs mt-3">
+                          <p>{blog.blogContent}</p>
                         </div>
                       </div>
                     </div>
-                  </Link>
-                ))
-              ) : (
-                <div>
-                  <p>eheh</p>
-                </div>
-              )}
-            </div>{" "} */}
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>

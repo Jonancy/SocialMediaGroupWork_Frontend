@@ -3,6 +3,7 @@ import TimeConverter from "../../../utils/formatDateTime";
 
 export default function BlogUpdateHistoryCard({ history }) {
   console.log(history);
+
   return (
     <div
       key={history}
@@ -10,10 +11,10 @@ export default function BlogUpdateHistoryCard({ history }) {
     >
       <div className=" flex gap-4 text-sm">
         <div className="flex flex-col gap-2 w-full">
-          <p className="text-xl first-letter:capitalize">
+          <p className="text-xl first-letter:capitalize line-clamp-3">
             {history?.blogTitle}
           </p>
-          <p className="line-clamp-6 text-balance">
+          <p className="line-clamp-4 text-balance">
             {history?.blogContent} ash sdh sd shds ds hdhs dhs dh shdhs dh hsc
             dshd sd shdu shudhsu dhush duhs duhusdn sjnhds dusudsud usdu s
             udusssssssss dsu dsu du shusdsd s dss s fssdnsd usdu hsu dhs udh
