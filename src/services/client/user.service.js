@@ -24,3 +24,7 @@ export const passwordChangeProfile = (values, user_id) => {
   console.log(values);
   return http.put(`/User/passwordChangeProfile/${user_id}`, values);
 };
+
+export const getAllNotifications = (userId) => {
+  return http.get(`/Notification/getNotifications/${userId}`);
+};

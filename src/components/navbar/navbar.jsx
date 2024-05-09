@@ -8,12 +8,15 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import NotificationCard from "../notification/notificationCard";
+import { getAllNotifications } from "../../services/client/user.service";
 
 export default function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const userMenuRef = useRef(null);
   const user = getLocalStorage().id;
   const [openDialog, setOpenDialog] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   console.log(user);
   const toggleUserMenu = () => {
@@ -38,6 +41,16 @@ export default function Navbar() {
     };
   }, [user]);
 
+  const getUserNotifications = async () => {
+    try {
+      const res = await getAllNotifications(user);
+      console.log(res.data);
+      setNotifications(res.data.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   function logOut() {
     clearLocalStorage();
     setIsUserMenuOpen(false);
@@ -48,6 +61,7 @@ export default function Navbar() {
   };
   const handleOpenDialog = () => {
     setOpenDialog(true);
+    getUserNotifications();
   };
 
   return (
@@ -89,10 +103,18 @@ export default function Navbar() {
                     />
                   </svg>
                 </button>
-                <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <Dialog
+                  maxWidth="lg"
+                  open={openDialog}
+                  onClose={handleCloseDialog}
+                >
                   <DialogTitle>Notification</DialogTitle>
                   <DialogContent>
-                    <p>hhhwhw</p>
+                    <div className="flex flex-col gap-2">
+                      {notifications?.map((noti) => (
+                        <NotificationCard noti={noti} />
+                      ))}
+                    </div>
                   </DialogContent>
                   <DialogActions>
                     <Button onClick={handleCloseDialog}>Close</Button>

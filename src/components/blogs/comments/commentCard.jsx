@@ -13,8 +13,11 @@ import { getLocalStorage } from "../../../utils/localStorage";
 import {
   deleteBlogComments,
   editBlogComments,
+  getBlogCommentHistory,
 } from "../../../services/client/blog-comments.service";
 import { toast } from "react-toastify";
+import NotificationCard from "../../notification/notificationCard";
+import TimeConverter from "../../../utils/formatDateTime";
 
 export default function CommentCard({ comment, getBlogDetails }) {
   const currentUser = getLocalStorage().id;
@@ -23,6 +26,12 @@ export default function CommentCard({ comment, getBlogDetails }) {
   const [editing, setEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment?.commentContent);
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [notificationHistory, setNotificationHistory] = useState([]);
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
 
   const handleEdit = () => {
     setEditing(!editing);
@@ -63,6 +72,21 @@ export default function CommentCard({ comment, getBlogDetails }) {
     }
   };
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+    getCommentHistory();
+  };
+
+  const getCommentHistory = async () => {
+    try {
+      const res = await getBlogCommentHistory(comment?.commentId);
+      console.log(res.data);
+      setNotificationHistory(res.data.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <div className="shadow-sm border rounded-lg p-6" key={comment?.commentId}>
       <div className="flex gap-2">
@@ -86,6 +110,7 @@ export default function CommentCard({ comment, getBlogDetails }) {
                 <button onClick={handleDelete}>
                   <FaTrash />
                 </button>
+                <button onClick={handleOpenDialog}>View History</button>
               </div>
             )}
           </div>
@@ -141,6 +166,31 @@ export default function CommentCard({ comment, getBlogDetails }) {
             >
               Cancel
             </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog maxWidth="lg" open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>Comments history</DialogTitle>
+          <DialogContent>
+            <div className="flex flex-col gap-2">
+              {notificationHistory?.length > 0 ? (
+                notificationHistory?.map((noti) => (
+                  <div className="bg-white rounded-lg shadow-md p-4  mx-auto w-[30rem]">
+                    <h3 className="text-lg font-bold mb-2">
+                      {/* {noti?.senderId?.username} */}
+                    </h3>
+                    <p className="text-gray-700 mb-2">{noti?.commentContent}</p>
+                    <p className="text-gray-500 text-sm">
+                      Updated on {TimeConverter(noti?.createdAt)}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="w-[30rem]">No history yet</p>
+              )}
+            </div>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Close</Button>
           </DialogActions>
         </Dialog>
       </div>

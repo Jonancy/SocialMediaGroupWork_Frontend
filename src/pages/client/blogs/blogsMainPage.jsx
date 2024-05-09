@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   postBlogVote,
   specificBlog,
@@ -24,6 +24,7 @@ export default function BlogsMainPage() {
   const [visibleComments, setVisibleComments] = useState(3);
   const [text, setText] = useState("");
   const [blogVotes, setBlogVotes] = useState([]);
+  const navigate = useNavigate();
 
   const getBlogDetails = async () => {
     try {
@@ -60,28 +61,38 @@ export default function BlogsMainPage() {
   };
 
   const postComments = async () => {
-    try {
-      const res = await postBlogComments(text, blog_id);
-      console.log(res);
-      toast.success(res.data.message);
-      setText("");
-      getBlogDetails();
-    } catch (e) {
-      console.log(e);
-      toast.error(e.response.data.message);
+    if (user_id != null) {
+      try {
+        const res = await postBlogComments(text, blog_id);
+        console.log(res);
+        toast.success(res.data.message);
+        setText("");
+        getBlogDetails();
+      } catch (e) {
+        console.log(e);
+        toast.error(e.response.data.message);
+      }
+    } else {
+      toast.error("Login first to post the comments");
+      navigate("/login");
     }
   };
 
   const postVote = async (vote) => {
-    try {
-      const res = await postBlogVote(blog_id, vote);
-      console.log(res);
-      toast.success(res.data.message);
-      setText("");
-      getBlogDetails();
-    } catch (e) {
-      console.log(e);
-      toast.error(e.response.data.message);
+    if (user_id != null) {
+      try {
+        const res = await postBlogVote(blog_id, vote);
+        console.log(res);
+        toast.success(res.data.message);
+        setText("");
+        getBlogDetails();
+      } catch (e) {
+        console.log(e);
+        toast.error(e.response.data.message);
+      }
+    } else {
+      toast.error("Login first to add reactions to the post");
+      navigate("/login");
     }
   };
 
@@ -115,37 +126,28 @@ export default function BlogsMainPage() {
           <div className="flex flex-col border-r border-r-black pr-16 w-full">
             <div className="bg-gray-200 rounded-lg p-4 flex gap-10 items-center text-lg font-semibold">
               <div className="flex items-center gap-2">
-                <Link to={"/blogs"}>
+                <Link to={"/home"}>
                   <div
                     className=" hover:bg-gray-300 p-1 rounded-lg relative cursor-pointer"
                     // onMouseEnter={handleMouseEnter}
                     // onMouseLeave={handleMouseLeave}
                   >
                     <p>Blogs</p>
-                    {/* {hoverReturn && (
-                      <div className="absolute -top-7 -right-10 z-40  rounded-lg p-1 text-sm bg-white">
-                        <p>return</p>
-                      </div>
-                    )} */}
                   </div>
                 </Link>
-                <IoIosArrowForward />
-                hehe
+
                 {/* {blog.blog_Tag?.tag_name} */}
               </div>
               <div className="flex items-center gap-2">
                 <BiCalendar />
+                Posted on:
                 <p>{blog?.blogCreatedAt}</p>
                 {/* {formatDate(blog?.createdAt)} */}
               </div>
-              <div className="flex items-center gap-2">
-                <FiTag />
-                tag
-                {/* {blog.blog_Tag?.tag_name} */}
-              </div>
+
               <div className="flex gap-4 items-center">
                 <div
-                  className="flex justify-end cursor-pointer"
+                  className="flex items-center gap-1 cursor-pointer"
                   onClick={() => postVote(true)}
                 >
                   {/* <FaHeart
@@ -157,9 +159,10 @@ export default function BlogsMainPage() {
                       userVote?.isVote ? "text-violet-950" : "text-white"
                     }`}
                   />
+                  <p className="text-sm">{blog?.totalUpVote} upvotes</p>
                 </div>
                 <div
-                  className="flex justify-end cursor-pointer"
+                  className="flex items-center cursor-pointer"
                   onClick={() => postVote(false)}
                 >
                   <BiSolidDownvote
@@ -169,6 +172,7 @@ export default function BlogsMainPage() {
                         : "text-white"
                     }`}
                   />
+                  <p className="text-sm">{blog?.totalDownVote} downvotes</p>
                 </div>
               </div>
             </div>
