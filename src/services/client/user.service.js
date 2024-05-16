@@ -28,3 +28,15 @@ export const passwordChangeProfile = (values, user_id) => {
 export const getAllNotifications = (userId) => {
   return http.get(`/Notification/getNotifications/${userId}`);
 };
+
+export const getUnreadNotiCounts = (user_id) => {
+  return http.get(`/Notification/getUnreadNotis/${user_id}`);
+};
+
+export const readUserNoti = (userId) => {
+  return http.put(`/Notification/readNoti/${userId}`);
+};
+
+export const updateUserDetails = (userId, formData) => {
+  return http.put(`/User/editProfile/${userId}`, formData);
+};
