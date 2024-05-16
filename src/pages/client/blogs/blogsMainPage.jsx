@@ -100,7 +100,7 @@ export default function BlogsMainPage() {
   const randomFourBlogs = shuffleArray(suggestions).slice(0, 4);
 
   // Find user's vote for the current blog
-  const userVote = blogVotes.find((vote) => vote.user.userId == user_id);
+  const userVote = blogVotes?.find((vote) => vote.user.userId == user_id);
 
   return (
     <div>
