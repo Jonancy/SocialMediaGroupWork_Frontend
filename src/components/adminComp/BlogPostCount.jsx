@@ -11,11 +11,11 @@ const BlogPostCount = ({ allTime, month }) => {
       </div>
       <div className="flex items-center justify-between mb-4">
         <span className="text-gray-600">All Time</span>
-        <span className="text-gray-800 font-bold">{allTime}</span>
+        <span className="text-gray-800 font-bold">{allTime?.toString()}</span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-gray-600">Month</span>
-        <span className="text-gray-800 font-bold">{month}</span>
+        <span className="text-gray-800 font-bold">{month?.toString()}</span>
       </div>
     </div>
   );
