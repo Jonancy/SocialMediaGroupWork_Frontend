@@ -14,10 +14,12 @@ import {
   deleteBlogComments,
   editBlogComments,
   getBlogCommentHistory,
+  postBlogCommentVote,
 } from "../../../services/client/blog-comments.service";
 import { toast } from "react-toastify";
 import NotificationCard from "../../notification/notificationCard";
 import TimeConverter from "../../../utils/formatDateTime";
+import { BiSolidDownvote, BiSolidUpvote } from "react-icons/bi";
 
 export default function CommentCard({ comment, getBlogDetails }) {
   const currentUser = getLocalStorage().id;
@@ -28,6 +30,7 @@ export default function CommentCard({ comment, getBlogDetails }) {
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [notificationHistory, setNotificationHistory] = useState([]);
+  const user_id = getLocalStorage().id;
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -44,6 +47,17 @@ export default function CommentCard({ comment, getBlogDetails }) {
       toast.success(res.data.message);
       setEditing(false);
       getBlogDetails();
+    } catch (e) {
+      console.log(e);
+      toast.error(e.response.data.message);
+    }
+  };
+
+  const voteComments = async (vote) => {
+    try {
+      const res = await postBlogCommentVote(comment?.commentId, vote);
+      console.log(res.data);
+      toast.success(res.data.message);
     } catch (e) {
       console.log(e);
       toast.error(e.response.data.message);
@@ -86,6 +100,9 @@ export default function CommentCard({ comment, getBlogDetails }) {
       console.log(e);
     }
   };
+  // const hasVoted = comment?.commentVotes?.filter(
+  //   (vote) => vote.user.userId === user_id
+  // );
 
   return (
     <div className="shadow-sm border rounded-lg p-6" key={comment?.commentId}>
@@ -102,6 +119,7 @@ export default function CommentCard({ comment, getBlogDetails }) {
             <p className="font-bold text-violet-950">
               {comment?.user?.username}
             </p>
+
             {currentUser === comment?.user?.userId && (
               <div className="flex items-center gap-2 text-sm">
                 <button onClick={handleEdit}>
@@ -139,6 +157,39 @@ export default function CommentCard({ comment, getBlogDetails }) {
           ) : (
             <p className="text-sm font-semibold">{comment?.commentContent}</p>
           )}
+          <div className="flex gap-4 items-center mt-2">
+            <div
+              className="flex items-center gap-1 cursor-pointer"
+              onClick={() => voteComments(true)}
+            >
+              <BiSolidUpvote
+              // className={`${
+              //   comment?.commentVotes?.length > 0 &&
+              //   comment?.commentVotes?.some(
+              //     (vote) => vote?.user?.userId == user_id
+              //   )
+              //     ? "text-violet-950"
+              //     : "text-gray-200"
+              // }`}
+              />
+              {/* <p className="text-sm">{blog?.totalUpVote} upvotes</p> */}
+              <p className="text-sm">0 upvotes</p>
+            </div>
+            <div
+              className="flex items-center cursor-pointer"
+              onClick={() => voteComments(false)}
+            >
+              <BiSolidDownvote
+                className="text-violet-950"
+
+                // className={`${
+                //   userVote?.isVote == false ? "text-violet-950" : "text-white"
+                // }`}
+              />
+              {/* <p className="text-sm">{blog?.totalDownVote} downvotes</p> */}
+              <p className="text-sm">1 downvotes</p>
+            </div>
+          </div>
         </div>
         {/* Confirmation Dialog */}
         <Dialog

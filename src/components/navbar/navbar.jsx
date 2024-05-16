@@ -9,7 +9,11 @@ import {
   Button,
 } from "@mui/material";
 import NotificationCard from "../notification/notificationCard";
-import { getAllNotifications } from "../../services/client/user.service";
+import {
+  getAllNotifications,
+  getUnreadNotiCounts,
+  readUserNoti,
+} from "../../services/client/user.service";
 
 export default function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -17,6 +21,8 @@ export default function Navbar() {
   const user = getLocalStorage().id;
   const [openDialog, setOpenDialog] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [unreadNotiCounts, setUnreadNotiCounts] = useState(0);
+  const navigate = useNavigate();
 
   console.log(user);
   const toggleUserMenu = () => {
@@ -28,6 +34,7 @@ export default function Navbar() {
   };
 
   useEffect(() => {
+    getUserUnreadNotification();
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         closeUserMenu();
@@ -51,17 +58,39 @@ export default function Navbar() {
     }
   };
 
+  const getUserUnreadNotification = async () => {
+    try {
+      const res = await getUnreadNotiCounts(user);
+      console.log(res.data);
+      setUnreadNotiCounts(res.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   function logOut() {
     clearLocalStorage();
     setIsUserMenuOpen(false);
+    window.location.reload();
   }
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
+
+  const readNoti = async () => {
+    try {
+      const res = await readUserNoti(user);
+      console.log(res.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
   const handleOpenDialog = () => {
     setOpenDialog(true);
     getUserNotifications();
+    readNoti();
+    getUserUnreadNotification();
   };
 
   return (
@@ -86,22 +115,25 @@ export default function Navbar() {
                   onClick={handleOpenDialog}
                   className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                 >
-                  <span className="absolute -inset-1.5"></span>
-                  <span className="sr-only">View notifications</span>
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-                    />
-                  </svg>
+                  <div className="relative">
+                    <svg
+                      className="w-5 h-5 text-black-600 animate-wiggle"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 21 21"
+                    >
+                      <path
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.585 15.5H5.415A1.65 1.65 0 0 1 4 13a10.526 10.526 0 0 0 1.5-5.415V6.5a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v1.085c0 1.907.518 3.78 1.5 5.415a1.65 1.65 0 0 1-1.415 2.5zm1.915-11c-.267-.934-.6-1.6-1-2s-1.066-.733-2-1m-10.912 3c.209-.934.512-1.6.912-2s1.096-.733 2.088-1M13 17c-.667 1-1.5 1.5-2.5 1.5S8.667 18 8 17"
+                      />
+                    </svg>
+                    <div className=" py[2px] bg-red-500 rounded-full text-center text-white text-[10px] absolute -top-3 -end-3 px-[5px]">
+                      {unreadNotiCounts > 0 && unreadNotiCounts}
+                      <div className="absolute top-0 start-0 rounded-full -z-10 animate-ping bg-red-200 w-full h-full"></div>
+                    </div>
+                  </div>
                 </button>
                 <Dialog
                   maxWidth="lg"

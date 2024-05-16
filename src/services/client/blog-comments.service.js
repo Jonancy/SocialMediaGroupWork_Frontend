@@ -23,3 +23,7 @@ export const deleteBlogComments = (blog_id) => {
 export const getBlogCommentHistory = (comment_id) => {
   return http.get(`/BlogComment/getCommentHistory/${comment_id}`);
 };
+
+export const postBlogCommentVote = (comment_id, vote) => {
+  return http.post(`/BlogComment/vote/${comment_id}`, { vote: vote });
+};

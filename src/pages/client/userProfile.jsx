@@ -82,9 +82,12 @@ export default function UserProfile() {
                 {user.gender}
               </p>
               <div className="flex gap-2">
-                <div className="text-sm font-semibold p-2 hover:bg-slate-200 duration-300 rounded-lg bg-slate-100 w-fit cursor-pointer border">
+                <Link
+                  to={`/specific-user/${user_id}/updateProfile`}
+                  className="text-sm font-semibold p-2 hover:bg-slate-200 duration-300 rounded-lg bg-slate-100 w-fit cursor-pointer border"
+                >
                   <p>Edit profile</p>
-                </div>
+                </Link>
                 <Link
                   to={`/specific-user/${user_id}/updatePassword`}
                   className="text-sm font-semibold p-2 hover:bg-slate-200 duration-300 rounded-lg bg-slate-100 w-fit cursor-pointer border"
